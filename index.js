@@ -1,3 +1,4 @@
+import fs from 'fs';
 import stream from 'stream';
 import imagemin from 'imagemin';
 import isPng from 'is-png';
@@ -8,7 +9,6 @@ import PngQuant from 'pngquant';
 import { isStream } from 'is-stream';
 import streams from 'memory-streams';
 import sharp from 'sharp';
-
 
 
 function isSVGFile(buffer) {
@@ -29,12 +29,18 @@ const imageminSvgo = () => {
     return Buffer.from(data);
   }
 }
-const reduce = (metadata) => {
-  const { width, height } = metadata;
-  return {
-    width: width * 0.5,
-    height: height * 0.5
-  }
+const pngQuantStream = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const bufferStream = new stream.PassThrough();
+    const readerStream = bufferStream.end(buffer);
+    const writerStream = new streams.WritableStream();
+    const myPngQuanter = new PngQuant([192, '--quality', '60-80', '--nofs', '-']);
+    readerStream.pipe(myPngQuanter).pipe(writerStream);
+    writerStream.on('finish', function () {
+      console.log('writerStream.toBuffer()', writerStream.toBuffer())
+      resolve(writerStream.toBuffer());
+    });
+  })
 }
 const imageminPng = () => {
   return async (buffer) => {
@@ -45,28 +51,7 @@ const imageminPng = () => {
     if (isBuffer && !isPng(buffer)) {
       return Promise.resolve(buffer);
     }
-    const bufferStream = new stream.PassThrough();
-    const sourceStream = bufferStream.end(buffer);
-
-    const createWriteStream = new streams.WritableStream();
-
-    //  使用sharp通过图片大小压缩（不是我想要的结果）
-    // const metadata = await sharp(buffer).metadata();
-    // const { width, height } = reduce(metadata)
-    // buffer = await sharp(buffer)
-    //   .resize({
-    //     width: width,
-    //     height: height,
-    //   })
-    //   .png({ compressionLevel: 9 })
-    //   .toBuffer();
-
-
-    const myPngQuanter = new PngQuant([192, '--quality', '60-80', '--nofs', '-']);
-    // console.log('myPngQuanter', myPngQuanter)
-    sourceStream.pipe(myPngQuanter).pipe(createWriteStream);
-    // console.log('createWriteStream', createWriteStream)
-    return buffer;
+    return await pngQuantStream(buffer);
   }
 }
 const imageminJpg = (option) => {
@@ -91,5 +76,4 @@ const imageminJpg = (option) => {
       imageminJpg()
     ]
   });
-  console.log('Images optimized', files);
 })();
