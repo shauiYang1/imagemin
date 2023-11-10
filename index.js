@@ -1,4 +1,7 @@
 import fs from 'fs';
+import path from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { exec, spawn } from 'node:child_process';
 import stream from 'stream';
 import imagemin from 'imagemin';
 import isPng from 'is-png';
@@ -8,7 +11,6 @@ import { optimize } from 'svgo';
 import PngQuant from 'pngquant';
 import { isStream } from 'is-stream';
 import streams from 'memory-streams';
-import sharp from 'sharp';
 
 
 function isSVGFile(buffer) {
@@ -30,14 +32,14 @@ const imageminSvgo = () => {
   }
 }
 const pngQuantStream = (buffer) => {
+
   return new Promise((resolve, reject) => {
     const bufferStream = new stream.PassThrough();
     const readerStream = bufferStream.end(buffer);
     const writerStream = new streams.WritableStream();
-    const myPngQuanter = new PngQuant([192, '--quality', '60-80', '--nofs', '-']);
+    const myPngQuanter = new PngQuant([192, '--quality', '65-80', '--nofs', '--verbose']);
     readerStream.pipe(myPngQuanter).pipe(writerStream);
     writerStream.on('finish', function () {
-      console.log('writerStream.toBuffer()', writerStream.toBuffer())
       resolve(writerStream.toBuffer());
     });
   })
@@ -67,13 +69,85 @@ const imageminJpg = (option) => {
     return buffer;
   }
 }
-(async () => {
-  const files = await imagemin(['src/assets/images/*.{svg,jpg,png}'], {
-    destination: 'dist/assets/images',
-    plugins: [
-      imageminSvgo(),
-      imageminPng(),
-      imageminJpg()
-    ]
+
+
+function getAllFilesInDirectory(directory) {
+  const files = [];
+  fs.readdirSync(directory, (err, entries) => {
+    if (err) {
+      console.error(`Error reading directory ${directory}: ${err}`);
+      return;
+    }
+    console.log('entryPath', entries);
+    entries.forEach((entry) => {
+      const entryPath = path.join(directory, entry);
+      if (fs.lstatSync(entryPath).isDirectory()) {
+        files.push(...getAllFilesInDirectory(entryPath));
+      } else {
+        files.push(entryPath);
+      }
+    });
   });
+
+  return files;
+}
+
+// 测试Node api
+function testCommand() {
+  //                       命令      参数  options配置
+  /*   const { stdout } = spawn('netstat', ['-an'], {})
+  
+    //返回的数据用data事件接受
+    stdout.on('data', (steram) => {
+      console.log(steram.toString())
+    }) */
+  const filePath = new URL('./src/assets/images/png/4.1-配图.png', import.meta.url);
+  exec(`pngquant --quality 20-30 --skip-if-larger src/assets/images/png/3.1-目标物光载因数.png --output src/assets/images/png/a.png`, (err, stdout, stderr) => {
+    if (err) {
+      return err
+    }
+  })
+  console.log('fs.readdirSync', path.join(process.cwd(), 'src'))
+  // const files = getAllFilesInDirectory('src/');
+  // console.log('files', files)
+  fs.readdirSync(path.join(process.cwd(), 'src'), (err, entries) => {
+    if (err) {
+      console.error(`Error reading directory ${directory}: ${err}`);
+      return;
+    }
+    console.log('entries', entries)
+  })
+}
+
+
+
+// const workerpath = new URL('./worker.js', import.meta.url);
+// const worker = new Worker(workerpath);
+(async () => {
+
+
+
+  const filePath = new URL('./src/assets/images/png/4.1-配图.png', import.meta.url);
+  // const filePath = new URL('./src/assets/images/png/concat.png', import.meta.url);
+  const contents = await readFile(filePath);
+  const bufferStream = new stream.PassThrough();
+  const readerStream = bufferStream.end(contents);
+  const writerStream = new streams.WritableStream();
+  const myPngQuanter = new PngQuant([256, '--quality', '65-80', '--nofs', '-']);
+  // worker.postMessage({ myPngQuanter, writerStream })
+  readerStream.pipe(myPngQuanter).pipe(writerStream);
+
+  writerStream.on('finish', function () {
+    console.log('writerStream.toBuffer()', writerStream.toBuffer())
+  });
+
+
+  // const files = await imagemin(['src/assets/images/**'], {
+  //   destination: 'dist/assets/images',
+  //   plugins: [
+  //     imageminSvgo(),
+  //     imageminPng(),
+  //     imageminJpg()
+  //   ]
+  // });
 })();
