@@ -1,15 +1,14 @@
-// node本地处理使用 
 import isJpg from 'is-jpg';
 import isPng from 'is-png';
 import images from 'images';
 import stream from 'stream';
 import { optimize } from 'svgo';
 import PngQuant from 'pngquant';
-import imagemin from 'imagemin';
 import unexpected from 'unexpected';
 import { isStream } from 'is-stream';
 import unexpectedSinon from 'unexpected-sinon';
 import unexpectedStream from 'unexpected-stream';
+
 
 
 const expect = unexpected.clone().use(unexpectedStream).use(unexpectedSinon);
@@ -74,13 +73,11 @@ const imageminJpg = (option) => {
   }
 }
 
-(async () => {
-  imagemin(['src/assets/images/**'], {
-    destination: 'dist/assets/images',
-    plugins: [
-      imageminSvgo(),
-      imageminPng(),
-      imageminJpg()
-    ]
-  });
-})();
+export {
+  imageminSvgo,
+  imageminPng,
+  imageminJpg,
+  isJpg,
+  isPng,
+  isSVGFile
+}
