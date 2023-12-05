@@ -6,7 +6,6 @@ npm install
 
 ```
 node index.js | npm run dev
-
 ```
 
 导出文件在dist/assets/images文件下
