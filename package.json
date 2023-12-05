@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-imgmin",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "图片压缩工具",
   "main": "lib/index.js",
   "type": "module",

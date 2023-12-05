@@ -32,4 +32,4 @@ npm install  rollup-plugin-imgmin  -D
 
 ```
 
-[项目地址github仓库地址](https://github.com/shauiYang1/imagemin)
+[pngquant官网](https://pngquant.org/)
