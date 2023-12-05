@@ -1,14 +1,17 @@
 
-1、直接使用
+## 1、直接使用
 git clone 项目
 
-npm install 安装依赖
+npm install
 
+```
 node index.js | npm run dev
+
+```
 
 导出文件在dist/assets/images文件下
 
-2、使用npm安装
+## 2、使用npm安装
 #rollup-plugin-imgmin 
 
 rollup 图片压缩插件 (目前仅支持压缩png、jpg、svg)
