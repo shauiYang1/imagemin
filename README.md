@@ -22,7 +22,7 @@ npm install  rollup-plugin-imgmin  -D
 ## usage
 
 ``` javascript
-    // 在package.json中配置
+    // 在config.js中配置
 
     import rollup-plugin-imgmin from 'rollup-plugin-imgmin'
 

@@ -67,10 +67,7 @@ export default function myPlugin(config) {
             buffer = images(buffer).encode("jpg", { quality: 70, ...option });
           }
           if (isPng(buffer)) {
-
-            console.log('old', buffer.length)
             buffer = await expectAsync(buffer)
-            console.log('new', buffer.length)
           }
           bundler[key] = {
             ...bundler[key],
