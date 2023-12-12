@@ -27,7 +27,9 @@ npm install  rollup-plugin-imgmin  -D
     import rollup-plugin-imgmin from 'rollup-plugin-imgmin'
 
      plugins: [
-      rollup-plugin-imgmin()
+      rollup-plugin-imgmin({
+        size:'medium' // 默认是medium 可以设置为small|medium|large
+      })
      ]
 
 ```
