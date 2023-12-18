@@ -58,6 +58,7 @@ const imageminPng = () => {
       return Promise.resolve(buffer);
     }
     return await pngQuantStream(buffer);
+
   }
 }
 const imageminJpg = (option) => {
