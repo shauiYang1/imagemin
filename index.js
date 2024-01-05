@@ -14,7 +14,6 @@ import unexpectedStream from 'unexpected-stream';
 
 const expect = unexpected.clone().use(unexpectedStream).use(unexpectedSinon);
 
-
 function isSVGFile(buffer) {
   const magicNumber = "<svg";
   const bufferString = buffer.toString("utf8", 0, magicNumber.length);
@@ -43,7 +42,7 @@ const pngQuantStream = (buffer) => {
       new PngQuant([128, '--quality', '60-80', '--nofs']),
       'to yield output satisfying',
       expect.it((resultPngBuffer) => {
-        resolve(resultPngBuffer);
+        resolve(resultPngBuffer)
       })
     )
   })
@@ -57,6 +56,7 @@ const imageminPng = () => {
     if (isBuffer && !isPng(buffer)) {
       return Promise.resolve(buffer);
     }
+
     return await pngQuantStream(buffer);
 
   }
